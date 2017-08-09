@@ -114,3 +114,16 @@ export class AppModule {
 
 Take a look on samples in [./sample](https://github.com/pleerock/ngx-tooltip/tree/master/sample) for more examples of
 usages.
+
+## Publishing
+
+1. Make a fork on github:
+
+2. npm install
+
+    `npm install`
+
+3. Do the changes (src, README.md and package.json) and then publish:
+
+    `gulp publish`
+    

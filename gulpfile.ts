@@ -50,6 +50,7 @@ export class Gulpfile {
      */
     @MergedTask()
     compileBundles() {
+        console.log("compileBundles ...");
         const amdTsProject = ts.createProject("tsconfig.json", {
             module: "amd",
             outFile: packageName + ".amd.js",

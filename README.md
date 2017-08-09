@@ -117,7 +117,7 @@ usages.
 
 ## Publishing
 
-1. Make a fork on github:
+1. Make a fork on github
 
 2. npm install
 
@@ -127,3 +127,20 @@ usages.
 
     `gulp publish`
     
+## Development
+
+1. Build the package:
+
+    `gulp publish`
+    
+2. go to package dir:
+
+    `cd ./build/package`
+    
+3. Run 'npm link' in that dir
+
+4. Go to your project root dir and run 'npm link ngx-tooltip-selectable'
+
+5. Now to can import this module to your NG2 app.
+
+6. In case of any changes in module - just run step 1 again (sometimes steps 2 and 3 if smth)

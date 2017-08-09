@@ -1,4 +1,5 @@
 import { Component, Input, AfterViewInit, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Debounce } from './Debounce.decorator';
 
 @Component({
     selector: 'tooltip-content',
@@ -62,7 +63,6 @@ export class TooltipContent implements AfterViewInit {
     ngAfterViewInit(): void {
         this.show();
         this.cdr.detectChanges();
-        console.log('tooltip element', this.element.nativeElement);
 
         let wrapper = this.element.nativeElement;
 
@@ -72,15 +72,13 @@ export class TooltipContent implements AfterViewInit {
         });
 
         wrapper.addEventListener('mouseleave', (e: any) => {
-            if (e.buttons === 2) return;
+            if (e.buttons === 2) return; // prevent mouseRightClick to call mouseleave handler
             this.mouseIn = false;
             console.log('mouse out tooltip', e);
             this.hide();
         });
 
-        wrapper.addEventListener('click', (e: any) => {
-            e.stopPropagation();
-        });
+
     }
 
     // -------------------------------------------------------------------------
@@ -90,7 +88,6 @@ export class TooltipContent implements AfterViewInit {
     show(): void {
         if (!this.hostElement)
             return;
-        console.log('Tooltip content show on ', this.hostElement);
         const p = this.positionElements(this.hostElement, this.element.nativeElement.children[0], this.placement);
         console.log('p', p);
         this.top = p.top;
@@ -100,6 +97,7 @@ export class TooltipContent implements AfterViewInit {
             this.isFade = true;
     }
 
+    @Debounce(150)
     hide(): void {
         if (this.mouseIn) return;
 

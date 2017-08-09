@@ -3,6 +3,7 @@ import {
     ComponentFactory
 } from '@angular/core';
 import { TooltipContent } from './TooltipContent';
+import { Debounce } from './Debounce.decorator';
 
 @Directive({
     selector: '[tooltip]'
@@ -46,12 +47,13 @@ export class Tooltip {
     // Public Methods
     // -------------------------------------------------------------------------
 
+    @Debounce(300)
     ngOnChanges() {
         console.log('visibility', this.visibility);
         if (this.visibility) {
-            setTimeout(() => this.show(), 0);
+            this.show();
         } else {
-            setTimeout(() => this.hide(), 0);
+            this.hide();
         }
     }
 
@@ -59,29 +61,20 @@ export class Tooltip {
         console.log('tooltip show');
 
         if (this.tooltipDisabled || this.visible) {
+            (this.content as TooltipContent).show(); // to recalculate position
             return;
         }
         this.visible = true;
-        if (typeof this.content === 'string') {
-            const factory = this.resolver.resolveComponentFactory(TooltipContent);
-            if (!this.visible)
-                return;
 
-            this.tooltip = this.viewContainerRef.createComponent(factory);
-            this.tooltip.instance.hostElement = this.viewContainerRef.element.nativeElement;
-            this.tooltip.instance.content = this.content as string;
-            this.tooltip.instance.placement = this.tooltipPlacement;
-            this.tooltip.instance.animation = this.tooltipAnimation;
-        } else {
-            const tooltip = this.content as TooltipContent;
-            tooltip.hostElement = this.viewContainerRef.element.nativeElement;
-            tooltip.placement = this.tooltipPlacement;
-            tooltip.animation = this.tooltipAnimation;
-            tooltip.show();
-        }
+        const tooltip = this.content as TooltipContent;
+        tooltip.hostElement = this.viewContainerRef.element.nativeElement;
+        tooltip.placement = this.tooltipPlacement;
+        tooltip.animation = this.tooltipAnimation;
+        tooltip.show();
     }
 
     hide(): void {
+        console.log('tooltip hide');
         if (!this.visible)
             return;
 

@@ -1,4 +1,4 @@
-import { Component, Input, AfterViewInit, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, AfterViewInit, ElementRef, ChangeDetectorRef, OnChanges } from '@angular/core';
 import { Debounce } from './Debounce.decorator';
 
 @Component({
@@ -18,7 +18,7 @@ import { Debounce } from './Debounce.decorator';
         </div>
     `
 })
-export class TooltipContent implements AfterViewInit {
+export class TooltipContent implements AfterViewInit, OnChanges {
 
     // -------------------------------------------------------------------------
     // Inputs / Outputs 
@@ -36,6 +36,8 @@ export class TooltipContent implements AfterViewInit {
     @Input()
     animation: boolean = true;
 
+    @Input()
+    changeSize: any;
     // -------------------------------------------------------------------------
     // Properties
     // -------------------------------------------------------------------------
@@ -59,6 +61,11 @@ export class TooltipContent implements AfterViewInit {
     // -------------------------------------------------------------------------
     // Lifecycle callbacks
     // -------------------------------------------------------------------------
+
+    ngOnChanges() {
+        console.log('Tooltip Content on changes');
+        this.show();
+    }
 
     ngAfterViewInit(): void {
         this.show();
@@ -89,9 +96,17 @@ export class TooltipContent implements AfterViewInit {
         if (!this.hostElement)
             return;
         const p = this.positionElements(this.hostElement, this.element.nativeElement.children[0], this.placement);
-        console.log('p', p);
+
+        let tooltip = this.element.nativeElement.children[0];
+        let parent = this.hostElement.offsetParent;
+        let leftLimit = parent.clientWidth;
         this.top = p.top;
+
         this.left = p.left < 0 ? 0 : p.left;
+        let correction = (this.left + tooltip.clientWidth) - leftLimit;
+        this.left = correction > 0 ? (this.left - correction - 2) : this.left;
+        console.log('this.left=', this.left);
+
         this.isIn = true;
         if (this.animation)
             this.isFade = true;
@@ -186,7 +201,6 @@ export class TooltipContent implements AfterViewInit {
             offsetParentBCR.top += offsetParentEl.clientTop - offsetParentEl.scrollTop;
             offsetParentBCR.left += offsetParentEl.clientLeft - offsetParentEl.scrollLeft;
         }
-
         const boundingClientRect = nativeEl.getBoundingClientRect();
         return {
             width: boundingClientRect.width || nativeEl.offsetWidth,

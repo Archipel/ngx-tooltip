@@ -64,7 +64,7 @@ export class TooltipContent implements AfterViewInit, OnChanges {
 
     ngOnChanges() {
         console.log('Tooltip Content on changes');
-        this.show();
+        setTimeout(() => this.show(), 0);
     }
 
     ngAfterViewInit(): void {
@@ -99,12 +99,26 @@ export class TooltipContent implements AfterViewInit, OnChanges {
 
         let tooltip = this.element.nativeElement.children[0];
         let parent = this.hostElement.offsetParent;
-        let leftLimit = parent.clientWidth;
-        this.top = p.top;
 
+        this.top = p.top;
+        let topCorrection = (this.top + tooltip.clientHeight) - this.hostElement.offsetTop;
+        console.log('topCorrection ', topCorrection);
+        console.log('this.top ', this.top);
+        console.log('tooltip.clientHeight ', tooltip.clientHeight);
+        console.log('this.hostElement.style.top ', this.hostElement.style.top, this.hostElement);
+        topCorrection = (this.placement === 'top') ? topCorrection : 0;
+        this.top = this.top + topCorrection;
+
+        let leftLimit = parent.clientWidth;
         this.left = p.left < 0 ? 0 : p.left;
-        let correction = (this.left + tooltip.clientWidth) - leftLimit;
-        this.left = correction > 0 ? (this.left - correction - 2) : this.left;
+        let leftCorrection = (this.left + tooltip.clientWidth) - leftLimit;
+        console.log('tooltip.clientWidth', tooltip.clientWidth);
+        console.log('parent.clientWidth', parent.clientWidth);
+        console.log('parent.clientWidth', parent.clientWidth);
+
+
+        this.left = leftCorrection > 0 ? (this.left - leftCorrection - 5) : this.left;
+        console.log('leftCorrection', leftCorrection);
         console.log('this.left=', this.left);
 
         this.isIn = true;

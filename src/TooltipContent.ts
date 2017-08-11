@@ -1,5 +1,9 @@
-import { Component, Input, AfterViewInit, ElementRef, ChangeDetectorRef, OnChanges } from '@angular/core';
+import {
+    Component, Input, AfterViewInit, ElementRef, ChangeDetectorRef, OnChanges, OnInit,
+    OnDestroy
+} from '@angular/core';
 import { Debounce } from './Debounce.decorator';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'tooltip-content',
@@ -18,7 +22,7 @@ import { Debounce } from './Debounce.decorator';
         </div>
     `
 })
-export class TooltipContent implements AfterViewInit, OnChanges {
+export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestroy {
 
     // -------------------------------------------------------------------------
     // Inputs / Outputs 
@@ -37,7 +41,10 @@ export class TooltipContent implements AfterViewInit, OnChanges {
     animation: boolean = true;
 
     @Input()
-    changeSize: any;
+    changeSize: any; // detecting changes on size of tooltip window
+
+    @Input()
+    hideTimeoutMs: number = 150;
     // -------------------------------------------------------------------------
     // Properties
     // -------------------------------------------------------------------------
@@ -48,8 +55,12 @@ export class TooltipContent implements AfterViewInit, OnChanges {
     isFade: boolean = false;
 
     mouseIn: boolean = false;
+    sizeWasChanged: boolean = false;
 
+    preventAutoHide: boolean = false;
 
+    onMouseEnter: Function;
+    onMouseLeave: Function;
     // -------------------------------------------------------------------------
     // Constructor
     // -------------------------------------------------------------------------
@@ -62,30 +73,57 @@ export class TooltipContent implements AfterViewInit, OnChanges {
     // Lifecycle callbacks
     // -------------------------------------------------------------------------
 
+    ngOnInit() {
+        this.onMouseEnter = () => {
+            this.preventAutoHide = false;
+            this.mouseIn = true;
+        };
+
+        const debouncedHide: Function = _.debounce(() => {
+            if (this.preventAutoHide) {
+                this.preventAutoHide = false;
+                return;
+            }
+            this.hide();
+        }, this.hideTimeoutMs);
+
+
+        this.onMouseLeave = (e: any) => {
+            if (e.buttons === 2) return; // prevent mouseRightClick to make run mouseleave handler
+            this.mouseIn = false;
+            if (this.sizeWasChanged) return;
+
+            debouncedHide();
+        };
+    }
+
+    @Debounce(0)
     ngOnChanges() {
-        console.log('Tooltip Content on changes');
-        setTimeout(() => this.show(), 0);
+        if (!this.sizeWasChanged && this.changeSize === true) {
+            this.sizeWasChanged = true;
+        }
+
+        this.show();
     }
 
     ngAfterViewInit(): void {
         this.show();
         this.cdr.detectChanges();
 
-        let wrapper = this.element.nativeElement;
+        this.element.nativeElement
+            .addEventListener('mouseenter', this.onMouseEnter);
 
-        wrapper.addEventListener('mouseenter', () => {
-            this.mouseIn = true;
-            console.log('mouse in tooltip');
-        });
+        this.element.nativeElement
+            .addEventListener('mouseleave', this.onMouseLeave);
 
-        wrapper.addEventListener('mouseleave', (e: any) => {
-            if (e.buttons === 2) return; // prevent mouseRightClick to call mouseleave handler
-            this.mouseIn = false;
-            console.log('mouse out tooltip', e);
-            this.hide();
-        });
+    }
 
+    ngOnDestroy() {
+        this.element.nativeElement
+            .removeEventListener('mouseenter', this.onMouseEnter);
 
+        this.element.nativeElement
+            .removeEventListener('mouseleave', this.onMouseLeave);
     }
 
     // -------------------------------------------------------------------------
@@ -102,33 +140,25 @@ export class TooltipContent implements AfterViewInit, OnChanges {
 
         this.top = p.top;
         let topCorrection = (this.top + tooltip.clientHeight) - this.hostElement.offsetTop;
-        console.log('topCorrection ', topCorrection);
-        console.log('this.top ', this.top);
-        console.log('tooltip.clientHeight ', tooltip.clientHeight);
-        console.log('this.hostElement.style.top ', this.hostElement.style.top, this.hostElement);
         topCorrection = (this.placement === 'top') ? topCorrection : 0;
         this.top = this.top + topCorrection;
 
         let leftLimit = parent.clientWidth;
         this.left = p.left < 0 ? 0 : p.left;
         let leftCorrection = (this.left + tooltip.clientWidth) - leftLimit;
-        console.log('tooltip.clientWidth', tooltip.clientWidth);
-        console.log('parent.clientWidth', parent.clientWidth);
-        console.log('parent.clientWidth', parent.clientWidth);
 
 
         this.left = leftCorrection > 0 ? (this.left - leftCorrection - 5) : this.left;
-        console.log('leftCorrection', leftCorrection);
-        console.log('this.left=', this.left);
 
         this.isIn = true;
         if (this.animation)
             this.isFade = true;
     }
 
-    @Debounce(150)
     hide(): void {
         if (this.mouseIn) return;
+
+        this.sizeWasChanged = false;
 
         this.top = -100000;
         this.left = -100000;

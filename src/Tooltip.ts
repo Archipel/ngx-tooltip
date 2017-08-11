@@ -3,7 +3,6 @@ import {
     ComponentFactory
 } from '@angular/core';
 import { TooltipContent } from './TooltipContent';
-import { Debounce } from './Debounce.decorator';
 
 @Directive({
     selector: '[tooltip]'
@@ -42,15 +41,16 @@ export class Tooltip {
     tooltipPlacement: 'top' | 'bottom' | 'left' | 'right' = 'bottom';
 
     @Input()
-    visibility: boolean;
+    visibility: { value: boolean, clickOutside?: boolean } = {value: false};
     // -------------------------------------------------------------------------
     // Public Methods
     // -------------------------------------------------------------------------
 
-    @Debounce(300)
     ngOnChanges() {
-        console.log('visibility', this.visibility);
-        if (this.visibility) {
+        if (this.visibility.clickOutside) {
+            (this.content as TooltipContent).mouseIn = false;
+        }
+        if (this.visibility.value) {
             this.show();
         } else {
             this.hide();
@@ -58,29 +58,29 @@ export class Tooltip {
     }
 
     show(): void {
-        console.log('tooltip show');
+        const tooltip = this.content as TooltipContent;
 
         if (this.tooltipDisabled || this.visible) {
-            (this.content as TooltipContent).show(); // to recalculate position
+            // to recalculate position
+            tooltip.placement = this.tooltipPlacement;
+            tooltip.preventAutoHide = true;
+            tooltip.show();
             return;
         }
         this.visible = true;
 
-        const tooltip = this.content as TooltipContent;
+
         tooltip.hostElement = this.viewContainerRef.element.nativeElement;
         tooltip.placement = this.tooltipPlacement;
         tooltip.animation = this.tooltipAnimation;
         tooltip.show();
     }
 
+    @HostListener('window:resize', ['$event'])
     hide(): void {
-        console.log('tooltip hide');
-        if (!this.visible)
-            return;
+        if ((this.content as TooltipContent).mouseIn) return;
 
         this.visible = false;
-        if (this.tooltip)
-            this.tooltip.destroy();
 
         if (this.content instanceof TooltipContent)
             (this.content as TooltipContent).hide();

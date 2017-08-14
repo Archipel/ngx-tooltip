@@ -1,11 +1,12 @@
 > This repository is for demonstration purposes of how it can be implemented in Angular and is not maintaned. Please fork and maintain your own version of this repository.
 
-# ngx-tooltip
+> It is a fork of ngx-tooltip of Umed Khudoiberdiev made by me for my specific case.
+
+# ngx-tooltip-selectable
 
 Simple tooltip control for your angular2 applications using bootstrap3. Does not depend of jquery.
-If you want to use it without bootstrap - simply create proper css classes. Please star a project if you liked it, or create an issue if you have problems with it.
+If you want to use it without bootstrap - simply create proper css classes. 
 
-![angular 2 tooltip](https://raw.githubusercontent.com/pleerock/ngx-tooltip/master/resources/tooltip-example.png)
 
 ## Installation
 
@@ -28,70 +29,83 @@ If you want to use it without bootstrap - simply create proper css classes. Plea
 
 ## Usage
 
-Example of simple usage:
+
+Example of usage with dynamic html content (the only way for now):
 
 ```html
-<span tooltip="content to be shown in the tooltip"
-      [tooltipDisabled]="false"
-      [tooltipAnimation]="true"
-      tooltipPlacement="top">
-    element on which this tooltip is applied.
-</span>
-```
-
-Example of usage with dynamic html content:
-
-```html
-<tooltip-content #myTooltip [animation]="true" placement="left">
+<tooltip-content #myTooltip 
+[animation]="true" 
+[hideTimeoutMs]="150"
+placement="left"
+[changeSize]="expandedTooltip"
+(clickOutside)="tooltipVisibility={value: false, clickOutside: true}"
+>
     <b>Very</b> <span style="color: #C21F39">Dynamic</span> <span style="color: #00b3ee">Reusable</span>
     <b><i><span style="color: #ffc520">Tooltip With</span></i></b> <small>Html support</small>.
 </tooltip-content>
 
-<button [tooltip]="myTooltip">element on which this tooltip is applied.</button>
+<button [tooltip]="myTooltip"
+         [tooltipPlacement]="tooltipPosition"
+         [visibility]="tooltipVisibility" 
+>element on which this tooltip is applied.</button>
 ```
 
 * `<span tooltip>`:
-    * `tooltip="string"` The message to be shown in the tooltip.
+    * `tooltip="tamplateID"` templateID of tooltip-content container to be shown in the tooltip.
+    * `[visibility]="boolean"` Manually show/hide tooltips in some specific cases.
     * `[tooltipDisabled]="true|false"` Indicates if tooltip should be disabled. If tooltip is disabled then it will not be shown. Default is **false**
-    * `[tooltipAnimation]="true|false"` Indicates if all tooltip should be shown with animation or not. Default is **true**.
+    * `[tooltipAnimation]="true|false"` Indicates if all tooltip will have animation class from bootstrap applied or not. Default is **true**.
     * `tooltipPlacement="top|bottom|left|right"` Indicates where the tooltip should be placed. Default is **"bottom"**.
 * `<tooltip-content>`:
-    * `[animation]="true|false"` Indicates if all tooltip should be shown with animation or not. Default is **true**.
+    * `[animation]="true|false"` Indicates if all tooltip should be shown with bootstrap animation or not. Default is **true**. Possibly will be Deprecated soon.
     * `placement="top|bottom|left|right"` Indicates where the tooltip should be placed. Default is **"bottom"**.
+    * `[hideTimeoutMs]="150"` Indicates tooltip auto-hide timespan after mouse-leaving of tooltip area. Default is **"150"**.
+    * `[changeSize]="variable"` If you plan to place some cotrols on tooltip area that change its size - then you should feed some variable change (from false to true and vice-versa) in this INPUT to recalculate tooltip position.
+    * `(clickOutside)="tooltipVisibility={value: false, clickOutside: true}"` . Since you are able to copy text from tooltip area and change its size - then auto-hiding is disabled after size-change of tooltip - use (clickOutside) to hide tooltip (clickOutside is not part of the module, install it by yourself separately)
 
 ## Sample
 
 ```typescript
 import {Component} from "@angular/core";
-import {TooltipModule} from "ngx-tooltip";
+import {TooltipModule} from "ngx-tooltip-selectable";
 
 @Component({
     selector: "app",
     template: `
 <div class="container">
 
-    <!-- regular tooltip -->
-    <p>
-        It is a long established <span tooltip="Hello fact!"><b>fact</b></span> that a reader will be distracted by the readable content of a page when looking at its layout.
-        The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
-        <span tooltip="many, but not all" tooltipPlacement="left"><b>Many desktop</b></span> publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy.
-        <span tooltip="various, but not all" tooltipPlacement="right"><b>Various versions</b></span> have evolved over the years, sometimes by accident, <span tooltip="another hint" tooltipPlacement="top"><b>sometimes on purpose</b></span> (injected humour and the like)
-    </p>
-
-    <!-- tooltip with dynamic html content -->
-    <div>
-        <tooltip-content #myTooltip>
-            <b>Very</b> <span style="color: #C21F39">Dynamic</span> <span style="color: #00b3ee">Reusable</span>
-            <b><i><span style="color: #ffc520">Tooltip With</span></i></b> <small>Html support</small>.
-        </tooltip-content>
-
-        <button [tooltip]="myTooltip">hover this button to see a tooltip</button>
+    <div class="tooltip-spot"
+         [tooltipPlacement]="tooltipPosition"
+         [tooltip]="myTooltip"
+         [visibility]="tooltipVisibility"
+         (mouseenter)="tooltipVisibility=true"
+         (mouseleave)="tooltipVisibility=false"
+    >
     </div>
+
+    <tooltip-content #myTooltip class="tooltip-area"
+                     [ngClass]="{expanded: expandedTooltip}"
+                     (clickOutside)="tooltipVisibility={value: false, clickOutside: true}"
+                     [hideTimeoutMs]="250"
+                     [changeSize]="expandedTooltip">
+        <div class="base-info" >
+            Main info {{variable}}
+        </div>
+        <div *ngIf="expandedTooltip">
+            More info {{moreINfoVariable}}
+        </div>
+
+        <button class="expand-button" (click)="expandedTooltip=!expandedTooltip">More info...</button>
+    </tooltip-content>
 
 </div>
 `
 })
-export class App {
+export class App implements {
+    
+    public tooltipPosition: string = 'bottom';
+    public tooltipVisibility: {value: boolean, clickOutside?: boolean} = {value: false};
+    public expandedTooltip: boolean = false;
 
 }
 
@@ -112,8 +126,9 @@ export class AppModule {
 }
 ```
 
-Take a look on samples in [./sample](https://github.com/pleerock/ngx-tooltip/tree/master/sample) for more examples of
-usages.
+*One more note - tooltip-content component apply 'tooltip' class on its template wrapper div. 
+You can set css rules to this class. And don't forget "position: absolute" since I've tested it only with this positioning.
+
 
 ## Publishing
 

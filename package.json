@@ -1,7 +1,7 @@
 {
   "name": "ngx-tooltip-selectable",
   "version": "0.1.0",
-  "description": "Simple tooltip control for your angular2 applications using bootstrap3 with posibility to copy text.",
+  "description": "Simple tooltip control for your angular2 applications using bootstrap3 with posibility to copy text. MODIFIED",
   "license": "MIT",
   "readmeFilename": "README.md",
   "private": true,
@@ -11,10 +11,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/pleerock/ngx-tooltip.git"
+    "url": "https://github.com/kievsash/ngx-tooltip.git"
   },
   "bugs": {
-    "url": "https://github.com/pleerock/ngx-tooltip/issues"
+    "url": "https://github.com/kievsash/ngx-tooltip/issues"
   },
   "tags": [
     "tooltip",

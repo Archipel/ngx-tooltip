@@ -14,12 +14,12 @@ import * as _ from 'lodash';
              [class.in]="isIn"
              [class.fade]="isFade"
              role="tooltip">
-            <div class="tooltip-arrow" [style.left]="caretLeft"></div>
             <div class="tooltip-inner">
                 <ng-content></ng-content>
                 {{ content }}
             </div>
         </div>
+        <div class="tooltip-arrow" [style.left]="caretLeft"></div>
     `
 })
 export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestroy {

@@ -19,7 +19,10 @@ import * as _ from 'lodash';
                 {{ content }}
             </div>
         </div>
-        <div class="tooltip-arrow" [style.left]="caretLeft"></div>
+        <div class="tooltip-arrow" 
+             [style.left]="caretLeft"
+             [style.top]="caretTop"
+        ></div>
     `
 })
 export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestroy {
@@ -52,6 +55,7 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
     top: number = -100000;
     left: number = -100000;
     caretLeft: string = '0px';
+    caretTop: string = '0px';
 
     isIn: boolean = false;
     isFade: boolean = false;
@@ -138,6 +142,7 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
         const p = this.positionElements(this.hostElement, this.element.nativeElement.children[0], this.placement);
 
         this.caretLeft = this.hostElement.style.left;
+        this.caretTop = this.hostElement.style.top;
 
         let tooltip = this.element.nativeElement.children[0];
         let parent = this.hostElement.offsetParent;

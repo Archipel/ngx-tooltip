@@ -103,7 +103,7 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
             this.sizeWasChanged = true;
         }
 
-        this.show();
+        setTimeout(() => this.show(), 0);
     }
 
     ngAfterViewInit(): void {

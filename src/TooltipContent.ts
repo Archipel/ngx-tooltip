@@ -14,7 +14,7 @@ import * as _ from 'lodash';
              [class.in]="isIn"
              [class.fade]="isFade"
              role="tooltip">
-            <div class="tooltip-arrow"></div>
+            <div class="tooltip-arrow" [style.left]="caretLeft"></div>
             <div class="tooltip-inner">
                 <ng-content></ng-content>
                 {{ content }}
@@ -51,6 +51,8 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
 
     top: number = -100000;
     left: number = -100000;
+    caretLeft: string = '0px';
+
     isIn: boolean = false;
     isFade: boolean = false;
 
@@ -134,6 +136,8 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
         if (!this.hostElement)
             return;
         const p = this.positionElements(this.hostElement, this.element.nativeElement.children[0], this.placement);
+
+        this.caretLeft = this.hostElement.style.left;
 
         let tooltip = this.element.nativeElement.children[0];
         let parent = this.hostElement.offsetParent;

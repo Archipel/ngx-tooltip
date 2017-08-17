@@ -19,7 +19,7 @@ import * as _ from 'lodash';
                 {{ content }}
             </div>
         </div>
-        <div class="tooltip-arrow" 
+        <div class="tooltip-arrow"
              [style.left]="caretLeft"
              [style.top]="caretTop"
         ></div>
@@ -171,6 +171,11 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
 
         this.top = -100000;
         this.left = -100000;
+
+
+        this.caretLeft = '-100000px';
+        this.caretTop = '-100000px';
+
         this.isIn = true;
         if (this.animation)
             this.isFade = false;

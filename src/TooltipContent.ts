@@ -68,7 +68,7 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
     onMouseEnter: Function;
     onMouseLeave: Function;
 
-    edgeCorrection: number = 15;
+    edgeCorrection: number = 5;
     // -------------------------------------------------------------------------
     // Constructor
     // -------------------------------------------------------------------------

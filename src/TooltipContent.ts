@@ -5,6 +5,25 @@ import {
 import { Debounce } from './Debounce.decorator';
 import * as _ from 'lodash';
 
+
+let browser = {
+    isIe: function () {
+        return navigator.appVersion.indexOf('MSIE') != -1;
+    },
+    navigator: navigator.appVersion,
+    getVersion: function () {
+        let version = 999; // we assume a sane browser
+        if (navigator.appVersion.indexOf('MSIE') != -1)
+        // bah, IE again, lets downgrade version number
+            version = parseFloat(navigator.appVersion.split('MSIE')[1]);
+        return version;
+    }
+};
+
+function forceReflow() {
+    document.body.className = document.body.className;
+};
+
 @Component({
     selector: 'tooltip-content',
     template: `
@@ -52,10 +71,10 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
     // Properties
     // -------------------------------------------------------------------------
 
-    top: number = -100000;
-    left: number = -100000;
-    caretLeft: string = '0px';
-    caretTop: string = '0px';
+    top: number = -10000;
+    left: number = -10000;
+    caretLeft: string = '-10000px';
+    caretTop: string = '-10000px';
 
     isIn: boolean = false;
     isFade: boolean = false;
@@ -137,16 +156,20 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
     // -------------------------------------------------------------------------
     // Public Methods
     // -------------------------------------------------------------------------
-
     show(): void {
-        if (!this.hostElement)
-            return;
-        const p = this.positionElements(this.hostElement, this.element.nativeElement.children[0], this.placement);
+
+        if (browser.isIe() && browser.getVersion() <= 9) {
+            forceReflow();
+        }
+
+        if (!this.hostElement) return;
+
+        let tooltip = this.element.nativeElement.children[0];
+
+        const p = this.positionElements(this.hostElement, tooltip, this.placement);
 
         this.caretLeft = this.hostElement.style.left;
         this.caretTop = this.hostElement.style.top;
-
-        let tooltip = this.element.nativeElement.children[0];
         let parent = this.hostElement.offsetParent;
 
         this.top = p.top;
@@ -160,7 +183,6 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
 
 
         this.left = leftCorrection > 0 ? (this.left - leftCorrection - this.edgeCorrection) : this.left;
-
         this.isIn = true;
         if (this.animation)
             this.isFade = true;
@@ -171,12 +193,12 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
 
         this.sizeWasChanged = false;
 
-        this.top = -100000;
-        this.left = -100000;
+        this.top = -10000;
+        this.left = -10000;
 
 
-        this.caretLeft = '-100000px';
-        this.caretTop = '-100000px';
+        this.caretLeft = '-10000px';
+        this.caretTop = '-10000px';
 
         this.isIn = true;
         if (this.animation)

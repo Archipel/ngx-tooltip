@@ -67,6 +67,8 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
 
     onMouseEnter: Function;
     onMouseLeave: Function;
+
+    edgeCorrection: number = 15;
     // -------------------------------------------------------------------------
     // Constructor
     // -------------------------------------------------------------------------
@@ -157,7 +159,7 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
         let leftCorrection = (this.left + tooltip.clientWidth) - leftLimit;
 
 
-        this.left = leftCorrection > 0 ? (this.left - leftCorrection - 5) : this.left;
+        this.left = leftCorrection > 0 ? (this.left - leftCorrection - this.edgeCorrection) : this.left;
 
         this.isIn = true;
         if (this.animation)

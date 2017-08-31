@@ -178,7 +178,7 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
         let parent = this.hostElement.offsetParent;
         let parentWidth = parent.clientWidth;
         let hostElementWidth = this.hostElement.offsetWidth;
-        let tooltipWidth = tooltip.clientWidth;
+        let tooltipWidth = tooltip.offsetWidth;
 
 
         let topCorrection = (p.top + tooltip.clientHeight) - this.hostElement.offsetTop;
@@ -190,7 +190,7 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
         let leftCorrection = (this.left + tooltipWidth) - leftLimit;
 
         if (this.placement === 'right') {
-            this.caretLeft += hostElementWidth;
+            this.caretLeft = parseInt(this.caretLeft, 10) + hostElementWidth + 'px';
         }
 
         this.left = leftCorrection > 0 ? (this.left - leftCorrection - this.edgeCorrection) : this.left;

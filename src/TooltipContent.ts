@@ -67,6 +67,9 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
 
     @Input()
     hideTimeoutMs: number = 150;
+
+    @Input()
+    keepOnMouseHover: boolean = true;
     // -------------------------------------------------------------------------
     // Properties
     // -------------------------------------------------------------------------
@@ -114,7 +117,6 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
             this.hide();
         }, this.hideTimeoutMs);
 
-
         this.onMouseLeave = (e: any) => {
             if (e.buttons === 2) return; // prevent mouseRightClick to make run mouseleave handler
             this.mouseIn = false;
@@ -137,20 +139,23 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
         this.show();
         this.cdr.detectChanges();
 
-        this.element.nativeElement
-            .addEventListener('mouseenter', this.onMouseEnter);
+        if (this.keepOnMouseHover) {
+            this.element.nativeElement
+                .addEventListener('mouseenter', this.onMouseEnter);
 
-        this.element.nativeElement
-            .addEventListener('mouseleave', this.onMouseLeave);
-
+            this.element.nativeElement
+                .addEventListener('mouseleave', this.onMouseLeave);
+        }
     }
 
     ngOnDestroy() {
-        this.element.nativeElement
-            .removeEventListener('mouseenter', this.onMouseEnter);
+        if (this.keepOnMouseHover) {
+            this.element.nativeElement
+                .removeEventListener('mouseenter', this.onMouseEnter);
 
-        this.element.nativeElement
-            .removeEventListener('mouseleave', this.onMouseLeave);
+            this.element.nativeElement
+                .removeEventListener('mouseleave', this.onMouseLeave);
+        }
     }
 
     // -------------------------------------------------------------------------

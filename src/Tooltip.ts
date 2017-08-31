@@ -20,8 +20,7 @@ export class Tooltip {
     // Constructor
     // -------------------------------------------------------------------------
 
-    constructor(private viewContainerRef: ViewContainerRef,
-                private resolver: ComponentFactoryResolver) {
+    constructor(private viewContainerRef: ViewContainerRef) {
     }
 
     // -------------------------------------------------------------------------
@@ -46,7 +45,7 @@ export class Tooltip {
     // Public Methods
     // -------------------------------------------------------------------------
 
-    ngOnChanges() {
+    ngOnChanges(changes: any) {
         if (this.visibility.clickOutside) {
             (this.content as TooltipContent).mouseIn = false;
         }

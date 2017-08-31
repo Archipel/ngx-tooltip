@@ -47,6 +47,7 @@ placement="left"
 <button [tooltip]="myTooltip"
          [tooltipPlacement]="tooltipPosition"
          [visibility]="tooltipVisibility" 
+         [keepOnMouseHover]="false"
 >element on which this tooltip is applied.</button>
 ```
 
@@ -60,6 +61,7 @@ placement="left"
     * `[animation]="true|false"` Indicates if all tooltip should be shown with bootstrap animation or not. Default is **true**. Possibly will be Deprecated soon.
     * `placement="top|bottom|left|right"` Indicates where the tooltip should be placed. Default is **"bottom"**.
     * `[hideTimeoutMs]="150"` Indicates tooltip auto-hide timespan after mouse-leaving of tooltip area. Default is **"150"**.
+    * `[keepOnMouseHover]="false"` Switchs on and off tooltip keeping being displayed on its area mouse hover (and text copy). Default is **"true"**.
     * `[changeSize]="variable"` If you plan to place some cotrols on tooltip area that change its size - then you should feed some variable change (from false to true and vice-versa) in this INPUT to recalculate tooltip position.
     * `(clickOutside)="tooltipVisibility={value: false, clickOutside: true}"` . Since you are able to copy text from tooltip area and change its size - then auto-hiding is disabled after size-change of tooltip - use (clickOutside) to hide tooltip (clickOutside is not part of the module, install it by yourself separately)
 

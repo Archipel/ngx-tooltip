@@ -176,16 +176,22 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
         this.caretLeft = this.hostElement.style.left;
         this.caretTop = this.hostElement.style.top;
         let parent = this.hostElement.offsetParent;
+        let parentWidth = parent.clientWidth;
+        let hostElementWidth = this.hostElement.offsetWidth;
+        let tooltipWidth = tooltip.clientWidth;
 
-        this.top = p.top;
-        let topCorrection = (this.top + tooltip.clientHeight) - this.hostElement.offsetTop;
+
+        let topCorrection = (p.top + tooltip.clientHeight) - this.hostElement.offsetTop;
         topCorrection = (this.placement === 'top') ? topCorrection : 0;
-        this.top = this.top + topCorrection;
+        this.top = p.top + topCorrection;
 
-        let leftLimit = parent.clientWidth;
+        let leftLimit = parentWidth;
         this.left = p.left < 0 ? 0 : p.left;
-        let leftCorrection = (this.left + tooltip.clientWidth) - leftLimit;
+        let leftCorrection = (this.left + tooltipWidth) - leftLimit;
 
+        if (this.placement === 'right') {
+            this.caretLeft += hostElementWidth;
+        }
 
         this.left = leftCorrection > 0 ? (this.left - leftCorrection - this.edgeCorrection) : this.left;
         this.isIn = true;

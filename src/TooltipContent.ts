@@ -4,11 +4,15 @@ import {
 } from '@angular/core';
 import { Debounce } from './Debounce.decorator';
 import * as _ from 'lodash';
+import { RequestAnimationFrameDefinition } from 'rxjs/util/AnimationFrame';
 
 
 let browser = {
     isIe: function () {
         return navigator.appVersion.indexOf('MSIE') != -1;
+    },
+    isSafari: function () {
+        return navigator.appVersion.indexOf('Safari') != -1;
     },
     navigator: navigator.appVersion,
     getVersion: function () {
@@ -86,6 +90,7 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
     sizeWasChanged: boolean = false;
 
     preventAutoHide: boolean = false;
+    visibility: boolean = false;
 
     onMouseEnter: Function;
     onMouseLeave: Function;
@@ -131,8 +136,10 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
         if (!this.sizeWasChanged && this.changeSize === true) {
             this.sizeWasChanged = true;
         }
-
-        setTimeout(() => this.show(), 0);
+        this.cdr.detectChanges();
+        if (this.visibility || this.sizeWasChanged || this.mouseIn) {
+            this.show();
+        }
     }
 
     ngAfterViewInit(): void {
@@ -161,6 +168,7 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
     // -------------------------------------------------------------------------
     // Public Methods
     // -------------------------------------------------------------------------
+    @Debounce(5)
     show(): void {
 
         if (browser.isIe() && browser.getVersion() <= 9) {
@@ -171,39 +179,12 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
 
         let tooltip = this.element.nativeElement.children[0];
 
-        const p = this.positionElements(this.hostElement, tooltip, this.placement);
+        requestAnimationFrame(() => {
+            [this.top, this.left] = this.correctPositionCalculation(tooltip);
+        });
 
-        this.caretLeft = this.hostElement.style.left;
-        this.caretTop = this.hostElement.style.top;
-        let parent = this.hostElement.offsetParent;
-        let parentWidth = parent.clientWidth;
-        let hostElementWidth = this.hostElement.offsetWidth;
-        let tooltipWidth = tooltip.offsetWidth;
+        this.calculateCaretPosition();
 
-
-        let topCorrectionUpperBorder = (p.top + tooltip.offsetHeight) - this.hostElement.offsetTop;
-        let topCorrectionBottomBorder = (p.top + tooltip.offsetHeight) - parent.clientHeight;
-        let topCorrection = 0;
-
-        if (this.placement === 'top') {
-            topCorrection = topCorrectionUpperBorder > 0 ? topCorrectionUpperBorder : 0;
-        }
-
-        if (this.placement === 'left' || this.placement === 'right') {
-            topCorrection = topCorrectionBottomBorder > 0 ? -topCorrectionBottomBorder : 0;
-        }
-
-        this.top = p.top < 0 ? 0 : p.top + topCorrection;
-
-        let leftLimit = parentWidth;
-        this.left = p.left < 0 ? 0 : p.left;
-        let leftCorrection = (this.left + tooltipWidth) - leftLimit;
-
-        if (this.placement === 'right') {
-            this.caretLeft = parseInt(this.caretLeft, 10) + hostElementWidth + 'px';
-        }
-
-        this.left = leftCorrection > 0 ? (this.left - leftCorrection - this.edgeCorrection) : this.left;
         this.isIn = true;
         if (this.animation)
             this.isFade = true;
@@ -229,6 +210,51 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
     // -------------------------------------------------------------------------
     // Private Methods
     // -------------------------------------------------------------------------
+
+    private correctPositionCalculation(tooltip: any) { // for absolute positioning inside container with no overlapping
+        let TOP: number = -10000;
+        let LEFT: number = -10000;
+
+        const p = this.positionElements(this.hostElement, tooltip, this.placement);
+
+        let parent = this.hostElement.offsetParent;
+        let parentWidth = parent.clientWidth;
+        let tooltipWidth = tooltip.offsetWidth;
+
+
+        let topCorrectionUpperBorder = (p.top + tooltip.offsetHeight) - this.hostElement.offsetTop;
+        let topCorrectionBottomBorder = (p.top + tooltip.offsetHeight) - parent.clientHeight;
+        let topCorrection = 0;
+
+        if (this.placement === 'top') {
+            topCorrection = topCorrectionUpperBorder > 0 ? topCorrectionUpperBorder : 0;
+        }
+
+        if (this.placement === 'left' || this.placement === 'right') {
+            topCorrection = topCorrectionBottomBorder > 0 ? -topCorrectionBottomBorder : 0;
+        }
+
+        TOP = p.top < 0 ? 0 : p.top + topCorrection;
+
+        let leftLimit = parentWidth;
+
+        LEFT = p.left < 0 ? 0 : p.left;
+        let leftCorrection = (LEFT + tooltipWidth) - leftLimit;
+
+        LEFT = leftCorrection > 0 ? (LEFT - leftCorrection - this.edgeCorrection) : LEFT;
+
+        return [TOP, LEFT];
+    }
+
+    private calculateCaretPosition() {
+        this.caretLeft = this.hostElement.style.left;
+        this.caretTop = this.hostElement.style.top;
+
+        if (this.placement === 'right') {
+            this.caretLeft = parseInt(this.caretLeft, 10) + this.hostElement.offsetWidth + 'px';
+        }
+
+    }
 
     private positionElements(hostEl: HTMLElement, targetEl: HTMLElement, positionStr: string, appendToBody: boolean = false): { top: number, left: number } {
         let positionStrParts = positionStr.split('-');

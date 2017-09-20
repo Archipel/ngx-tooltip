@@ -181,9 +181,9 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
 
         requestAnimationFrame(() => {
             [this.top, this.left] = this.correctPositionCalculation(tooltip);
+            this.calculateCaretPosition();
+            this.cdr.detectChanges();
         });
-
-        this.calculateCaretPosition();
 
         this.isIn = true;
         if (this.animation)

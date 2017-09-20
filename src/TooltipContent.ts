@@ -168,9 +168,9 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
     // -------------------------------------------------------------------------
     // Public Methods
     // -------------------------------------------------------------------------
-    @Debounce(5)
+    // @Debounce(5)
     show(): void {
-
+        this.hide();
         if (browser.isIe() && browser.getVersion() <= 9) {
             forceReflow();
         }
@@ -191,7 +191,15 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
     }
 
     hide(): void {
-        if (this.mouseIn) return;
+        if (this.mouseIn) {
+            requestAnimationFrame(() => {
+                let tooltip = this.element.nativeElement.children[0];
+                [this.top, this.left] = this.correctPositionCalculation(tooltip);
+                this.calculateCaretPosition();
+                this.cdr.detectChanges();
+            });
+            return;
+        }
 
         this.sizeWasChanged = false;
 
@@ -234,7 +242,7 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
             topCorrection = topCorrectionBottomBorder > 0 ? -topCorrectionBottomBorder : 0;
         }
 
-        TOP = p.top < 0 ? 0 : p.top + topCorrection;
+        TOP = p.top < -10 ? -10 : p.top + topCorrection;
 
         let leftLimit = parentWidth;
 

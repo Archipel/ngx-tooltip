@@ -84,12 +84,10 @@ export class Tooltip {
 
     @HostListener('window:resize', ['$event'])
     hide(): void {
+        (this.content as TooltipContent).hide();
         if ((this.content as TooltipContent).mouseIn) return;
 
         this.visible = false;
-
-        if (this.content instanceof TooltipContent)
-            (this.content as TooltipContent).hide();
     }
 
 }

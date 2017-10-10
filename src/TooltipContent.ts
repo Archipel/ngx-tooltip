@@ -36,13 +36,15 @@ function forceReflow() {
              [style.left]="left + 'px'"
              [class.in]="isIn"
              [class.fade]="isFade"
+             [class.corrected]="correctionAbsolute"
+             
              role="tooltip">
             <div class="tooltip-inner">
                 <ng-content></ng-content>
                 {{ content }}
             </div>
         </div>
-        <div class="tooltip-arrow"
+        <div class="tooltip-arrow" *ngIf="correctionAbsolute"
              [style.left]="caretLeft"
              [style.top]="caretTop"
         ></div>
@@ -65,6 +67,9 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
 
     @Input()
     animation: boolean = true;
+
+    @Input()
+    correctionAbsolute: boolean = true;
 
     @Input()
     changeSize: any; // detecting changes on size of tooltip window
@@ -251,7 +256,7 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
 
         LEFT = leftCorrection > 0 ? (LEFT - leftCorrection - this.edgeCorrection) : LEFT;
 
-        return [TOP, LEFT];
+        return this.correctionAbsolute ? [TOP, LEFT] : [p.top, p.left];
     }
 
     private calculateCaretPosition() {

@@ -36,8 +36,7 @@ function forceReflow() {
              [style.left]="left + 'px'"
              [class.in]="isIn"
              [class.fade]="isFade"
-             [class.corrected]="correctionAbsolute"
-             
+             [ngClass]="{'corrected':correctionAbsolute}"
              role="tooltip">
             <div class="tooltip-inner">
                 <ng-content></ng-content>

@@ -63,6 +63,7 @@ placement="left"
     * `[hideTimeoutMs]="150"` Indicates tooltip auto-hide timespan after mouse-leaving of tooltip area. Default is **"150"**.
     * `[keepOnMouseHover]="false"` Switchs on and off tooltip keeping being displayed on its area mouse hover (and text copy). Default is **"true"**.
     * `[changeSize]="variable"` If you plan to place some cotrols on tooltip area that change its size - then you should feed some variable change (from false to true and vice-versa) in this INPUT to recalculate tooltip position.
+    * `[correctionAbsolute]="variable"` Turn off absolute positioned tooltip calculation (use to correct top and left coordinates to fit parent borders).
     * `(clickOutside)="tooltipVisibility={value: false, clickOutside: true}"` . Since you are able to copy text from tooltip area and change its size - then auto-hiding is disabled after size-change of tooltip - use (clickOutside) to hide tooltip (clickOutside is not part of the module, install it by yourself separately)
 
 ## Sample

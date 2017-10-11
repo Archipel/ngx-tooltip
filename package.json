@@ -1,6 +1,6 @@
 {
   "name": "ngx-tooltip-selectable",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "description": "Simple tooltip control for your angular2 applications using bootstrap3 with posibility to copy text. MODIFIED",
   "license": "MIT",
   "readmeFilename": "README.md",

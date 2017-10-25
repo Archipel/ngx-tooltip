@@ -46,18 +46,18 @@ export class Tooltip {
     // -------------------------------------------------------------------------
 
     ngOnChanges(changes: any) {
-        if (this.visibility.clickOutside) {
+        if (this.visibility && this.visibility.clickOutside) {
             (this.content as TooltipContent).mouseIn = false;
         }
         if (changes.tooltipPlacement) {
             (this.content as TooltipContent).placement = this.tooltipPlacement;
         }
-        if (this.visibility.value) {
+        if (this.visibility && this.visibility.value) {
             (this.content as TooltipContent).visibility = true;
             this.show();
         }
 
-        if (!this.visibility.value) {
+        if (this.visibility && !this.visibility.value) {
             (this.content as TooltipContent).visibility = false;
             this.hide();
         }

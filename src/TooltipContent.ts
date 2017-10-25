@@ -4,7 +4,6 @@ import {
 } from '@angular/core';
 import { Debounce } from './Debounce.decorator';
 import * as _ from 'lodash';
-import { RequestAnimationFrameDefinition } from 'rxjs/util/AnimationFrame';
 
 
 let browser = {
@@ -152,10 +151,10 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
 
         if (this.keepOnMouseHover) {
             this.element.nativeElement
-                .addEventListener('mouseenter', this.onMouseEnter);
+                .addEventListener('mouseenter', this.onMouseEnter.bind(this));
 
             this.element.nativeElement
-                .addEventListener('mouseleave', this.onMouseLeave);
+                .addEventListener('mouseleave', this.onMouseLeave.bind(this));
         }
     }
 
@@ -181,9 +180,8 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
 
         if (!this.hostElement) return;
 
-        let tooltip = this.element.nativeElement.children[0];
-
         requestAnimationFrame(() => {
+            let tooltip = this.element.nativeElement.children[0];
             [this.top, this.left] = this.correctPositionCalculation(tooltip);
             this.calculateCaretPosition();
             this.cdr.detectChanges();
@@ -232,7 +230,6 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
         let parent = this.hostElement.offsetParent;
         let parentWidth = parent.clientWidth;
         let tooltipWidth = tooltip.offsetWidth;
-
 
         let topCorrectionUpperBorder = (p.top + tooltip.offsetHeight) - this.hostElement.offsetTop;
         let topCorrectionBottomBorder = (p.top + tooltip.offsetHeight) - parent.clientHeight;

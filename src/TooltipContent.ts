@@ -1,6 +1,6 @@
 import {
     Component, Input, AfterViewInit, ElementRef, ChangeDetectorRef, OnChanges, OnInit,
-    OnDestroy
+    OnDestroy, Output, EventEmitter
 } from '@angular/core';
 import { Debounce } from './Debounce.decorator';
 import * as _ from 'lodash';
@@ -77,6 +77,12 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
 
     @Input()
     keepOnMouseHover: boolean = true;
+
+    @Output()
+    public tooltipOnMouseEnter: EventEmitter<any> = new EventEmitter();
+
+    @Output()
+    public tooltipOnMouseLeave: EventEmitter<any> = new EventEmitter();
     // -------------------------------------------------------------------------
     // Properties
     // -------------------------------------------------------------------------
@@ -115,6 +121,7 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
         this.onMouseEnter = () => {
             this.preventAutoHide = false;
             this.mouseIn = true;
+            this.tooltipOnMouseEnter.emit();
         };
 
         const debouncedHide: Function = _.debounce(() => {
@@ -128,6 +135,7 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
         this.onMouseLeave = (e: any) => {
             if (e.buttons === 2) return; // prevent mouseRightClick to make run mouseleave handler
             this.mouseIn = false;
+            this.tooltipOnMouseLeave.emit();
             if (this.sizeWasChanged) return;
 
             debouncedHide();

@@ -4,6 +4,7 @@ import {
 } from '@angular/core';
 import { Debounce } from './Debounce.decorator';
 import * as _ from 'lodash';
+import { ViewRef_ } from '@angular/core/src/linker/view_ref';
 
 
 let browser = {
@@ -147,7 +148,10 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
         if (!this.sizeWasChanged && this.changeSize === true) {
             this.sizeWasChanged = true;
         }
-        this.cdr.detectChanges();
+        if (!(this.cdr as ViewRef_<any>).destroyed) {
+            this.cdr.detectChanges();
+        }
+
         if (this.visibility || this.sizeWasChanged || this.mouseIn) {
             this.show();
         }
@@ -192,7 +196,9 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
             let tooltip = this.element.nativeElement.children[0];
             [this.top, this.left] = this.correctPositionCalculation(tooltip);
             this.calculateCaretPosition();
-            this.cdr.detectChanges();
+            if (!(this.cdr as ViewRef_<any>).destroyed) {
+                this.cdr.detectChanges();
+            }
         });
 
         this.isIn = true;
@@ -206,7 +212,9 @@ export class TooltipContent implements AfterViewInit, OnChanges, OnInit, OnDestr
                 let tooltip = this.element.nativeElement.children[0];
                 [this.top, this.left] = this.correctPositionCalculation(tooltip);
                 this.calculateCaretPosition();
-                this.cdr.detectChanges();
+                if (!(this.cdr as ViewRef_<any>).destroyed) {
+                    this.cdr.detectChanges();
+                }
             });
             return;
         }
